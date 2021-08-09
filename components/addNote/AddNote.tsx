@@ -6,10 +6,17 @@ import {
   InputBase,
   Card,
   Divider,
+  Button,
+  Typography,
 } from "@material-ui/core";
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
+import PlaylistAddCheckIcon from "@material-ui/icons/PlaylistAddCheck";
+import NoteIcon from "@material-ui/icons/Note";
+import GestureIcon from "@material-ui/icons/Gesture";
+import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
+import ToggleButton from "@material-ui/lab/ToggleButton";
 
 import {
   collection,
@@ -22,6 +29,8 @@ import {
 import { db } from "../../firebase/firebase";
 import { useContext } from "react";
 import { IKContext } from "../../context/context";
+import { ButtonGroup } from "@material-ui/core";
+import MyList from "../List/List";
 
 // try {
 //   const docRef = await addDoc(collection(db, "users"), {
@@ -39,7 +48,7 @@ export default function AddNote() {
   const useStyles = makeStyles((theme: Theme) =>
     createStyles({
       root: {
-        width: "350px",
+        width: "100%",
       },
       card: {
         padding: theme.spacing(2),
@@ -51,6 +60,12 @@ export default function AddNote() {
       title: {
         width: "100%",
       },
+      buttonsContainer: {
+        marginTop: theme.spacing(2),
+        "& button:not(:disabled) svg": {
+          color: theme.palette.primary.main,
+        },
+      },
     })
   );
   const classes = useStyles();
@@ -59,6 +74,7 @@ export default function AddNote() {
   const contentInfoRef = useRef<HTMLElement>();
   const titleRef = useRef<HTMLElement>();
   const rootRef = useRef<HTMLDivElement>(null);
+  const [noteType, setNoteType] = useState<"note" | "list" | "draw">("note");
   const { state, dispatch } = useContext(IKContext);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -126,21 +142,75 @@ export default function AddNote() {
               </>
             )}
 
-            <Grid item>
-              <InputBase
-                ref={contentInfoRef}
-                multiline
-                value={content}
-                style={{ minHeight: focused ? "100px" : "" }}
-                onChange={(e) => setContent(e.target.value)}
-                className={classes.content}
-                placeholder="Añadir una nueva nota"
-              />
-            </Grid>
+            {noteType === "note" && (
+              <Grid item>
+                <InputBase
+                  ref={contentInfoRef}
+                  multiline
+                  value={content}
+                  style={{ minHeight: focused ? "100px" : "" }}
+                  onChange={(e) => setContent(e.target.value)}
+                  className={classes.content}
+                  placeholder="Añadir una nueva nota"
+                />
+              </Grid>
+            )}
+            {noteType === "list" && <MyList />}
           </Grid>
+
           <button type="submit" style={{ display: "none" }} />
         </form>
       </Card>
+      {focused && (
+        <Grid
+          container
+          justifyContent="center"
+          className={classes.buttonsContainer}
+        >
+          <ToggleButtonGroup
+            value={noteType}
+            color="primary"
+            exclusive
+            onChange={(e, value) => setNoteType(value)}
+            aria-label="text alignment"
+          >
+            <ToggleButton value="note">
+              <Grid container direction="column">
+                <Grid item>
+                  <NoteIcon />
+                </Grid>
+                <Grid item>
+                  <Typography color="primary" variant="button">
+                    Nota
+                  </Typography>
+                </Grid>
+              </Grid>
+            </ToggleButton>
+            <ToggleButton value="list">
+              <Grid container direction="column">
+                <Grid item>
+                  <PlaylistAddCheckIcon />
+                </Grid>
+                <Grid item>
+                  <Typography color="primary" variant="button">
+                    Lista
+                  </Typography>
+                </Grid>
+              </Grid>
+            </ToggleButton>
+            <ToggleButton disabled value="draw">
+              <Grid container direction="column">
+                <Grid item>
+                  <GestureIcon />
+                </Grid>
+                <Grid item>
+                  <Typography variant="button">Draw</Typography>
+                </Grid>
+              </Grid>
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Grid>
+      )}
     </div>
   );
 }

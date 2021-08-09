@@ -161,14 +161,6 @@ export default function NoteList() {
         <Grid container spacing={4} direction="column" alignItems="center">
           <Grid container direction="column" alignItems="center" spacing={1}>
             <AddNote />
-            <Button
-              onClick={() => {
-                setShuffle(!shuffle);
-              }}
-              color="primary"
-            >
-              Suffle
-            </Button>
           </Grid>
           <Grid container spacing={2} item justifyContent="center">
             {notes?.map((note) => {
